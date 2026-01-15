@@ -9,6 +9,7 @@ export default function Home() {
   });
 
   const [darkMode, setDarkMode] = useState(false);
+  const [filter, setFilter] = useState("all");
 
   // 🌗 Dark mode persist
   useEffect(() => {
@@ -37,14 +38,21 @@ export default function Home() {
   const progressPercent =
     totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
 
-  // 🔀 Sort tasks (active first, completed last)
+  // 🔀 Sort tasks (active first)
   const sortedTasks = [
     ...tasks.filter((t) => !t.completed),
     ...tasks.filter((t) => t.completed),
   ];
 
+  // 🔍 Filter tasks
+  const filteredTasks = sortedTasks.filter((task) => {
+    if (filter === "active") return !task.completed;
+    if (filter === "completed") return task.completed;
+    return true;
+  });
+
   // ➕ Add task
-  const addTask = (title) => {
+  const addTask = (title, category) => {
     if (!title.trim()) return;
 
     setTasks([
@@ -53,6 +61,7 @@ export default function Home() {
         id: Date.now(),
         title,
         completed: false,
+        category,
       },
     ]);
   };
@@ -99,6 +108,32 @@ export default function Home() {
         {/* FORM */}
         <TaskForm onAdd={addTask} />
 
+        {/* FILTERS */}
+        {tasks.length > 0 && (
+          <div className="mt-4 flex justify-center gap-2">
+            {["all", "active", "completed"].map((type) => (
+              <button
+                key={type}
+                onClick={() => setFilter(type)}
+                className={`
+                  px-3 py-1.5 rounded-full text-xs font-medium transition
+                  ${
+                    filter === type
+                      ? "bg-primary text-white shadow"
+                      : "bg-gray-100 dark:bg-white/10 text-gray-500 hover:bg-gray-200"
+                  }
+                `}
+              >
+                {type === "all"
+                  ? "All"
+                  : type === "active"
+                  ? "Active"
+                  : "Completed"}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* PROGRESS */}
         {tasks.length > 0 && (
           <div className="mt-4 animate-fade-in">
@@ -142,7 +177,7 @@ export default function Home() {
         ) : (
           <div className="animate-fade-in mt-4">
             <TaskList
-              tasks={sortedTasks}
+              tasks={filteredTasks}
               onDelete={deleteTask}
               onToggle={toggleTask}
             />

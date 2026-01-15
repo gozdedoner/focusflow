@@ -1,0 +1,8 @@
+export type TaskCategory = "work" | "personal" | "study" | "health";
+
+export interface Task {
+  id: number;
+  title: string;
+  completed: boolean;
+  category: TaskCategory;
+}

@@ -2,14 +2,16 @@ import { useState } from "react";
 
 export default function TaskForm({ onAdd }) {
   const [value, setValue] = useState("");
+  const [category, setCategory] = useState("work");
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!value.trim()) return;
 
-    onAdd(value);
-    setValue(""); // input temizlensin
+    onAdd(value, category);
+    setValue("");
+    setCategory("work");
   };
 
   return (
@@ -27,6 +29,24 @@ export default function TaskForm({ onAdd }) {
           transition
         "
       />
+
+      <select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        className="
+          px-3 py-2 rounded-lg
+          border border-gray-300
+          bg-white
+          focus:outline-none
+          focus:ring-2 focus:ring-primarySoft
+          transition
+        "
+      >
+        <option value="work">Work</option>
+        <option value="personal">Personal</option>
+        <option value="study">Study</option>
+        <option value="health">Health</option>
+      </select>
 
       <button
         type="submit"
