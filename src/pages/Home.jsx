@@ -2,6 +2,56 @@ import { useEffect, useState } from "react";
 import TaskForm from "../components/TaskForm";
 import TaskList from "../components/TaskList";
 
+function CircularProgress({ percentage }) {
+  const radius = 36;
+  const stroke = 6;
+  const normalizedRadius = radius - stroke * 2;
+  const circumference = normalizedRadius * 2 * Math.PI;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+  return (
+    <svg height={radius * 2} width={radius * 2}>
+      <circle
+        stroke="rgba(0,0,0,0.08)"
+        fill="transparent"
+        strokeWidth={stroke}
+        r={normalizedRadius}
+        cx={radius}
+        cy={radius}
+      />
+      <circle
+        stroke="url(#gradient)"
+        fill="transparent"
+        strokeWidth={stroke}
+        strokeDasharray={`${circumference} ${circumference}`}
+        style={{
+          strokeDashoffset,
+          transition: "stroke-dashoffset 0.6s ease",
+        }}
+        r={normalizedRadius}
+        cx={radius}
+        cy={radius}
+        strokeLinecap="round"
+      />
+      <defs>
+        <linearGradient id="gradient">
+          <stop offset="0%" stopColor="#7C7AF2" />
+          <stop offset="100%" stopColor="#B6B4FF" />
+        </linearGradient>
+      </defs>
+      <text
+        x="50%"
+        y="50%"
+        dominantBaseline="middle"
+        textAnchor="middle"
+        className="text-xs font-semibold fill-gray-700 dark:fill-gray-200"
+      >
+        %{percentage}
+      </text>
+    </svg>
+  );
+}
+
 export default function Home() {
   const [tasks, setTasks] = useState(() => {
     const saved = localStorage.getItem("tasks");
@@ -136,31 +186,37 @@ export default function Home() {
 
         {/* PROGRESS */}
         {tasks.length > 0 && (
-          <div className="mt-4 animate-fade-in">
-            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
-              <span>
-                {completedCount} / {totalCount} tamamlandı
-              </span>
-              <span>%{progressPercent}</span>
-            </div>
+          <div className="mt-6 flex items-center gap-4 animate-fade-in">
+            {/* CIRCULAR */}
+            <CircularProgress percentage={progressPercent} />
 
-            <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
-              <div
-                className="
-                  h-full rounded-full
-                  bg-gradient-to-r from-primary to-primarySoft
-                  shadow-[0_0_12px_rgba(124,122,242,0.6)]
-                  transition-all duration-700
-                "
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
+            {/* LINEAR + TEXT */}
+            <div className="flex-1">
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                <span>
+                  {completedCount} / {totalCount} tamamlandı
+                </span>
+                <span>%{progressPercent}</span>
+              </div>
 
-            {progressPercent === 100 && (
-              <p className="mt-2 text-center text-xs text-primary animate-fade-in">
-                🎉 Bugünkü tüm görevleri tamamladın. Harika iş!
-              </p>
-            )}
+              <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
+                <div
+                  className="
+            h-full rounded-full
+            bg-gradient-to-r from-primary to-primarySoft
+            shadow-[0_0_12px_rgba(124,122,242,0.6)]
+            transition-all duration-700
+          "
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+
+              {progressPercent === 100 && (
+                <p className="mt-2 text-xs text-primary animate-fade-in">
+                  🎉 Bugünkü tüm görevleri tamamladın. Harika iş!
+                </p>
+              )}
+            </div>
           </div>
         )}
 
